@@ -120,3 +120,58 @@ describe('GET endpoint',function(){
   })
 })
 
+describe('POST endpoint',function(){
+  it('should add an item on POST', function() {
+    const newItem = {title: 'Test Blog Post', content: 'This is a test blog post.', author: 'Peter McGrath'};
+    return chai.request(app)
+      .post('/blog-posts')
+      .send(newItem)
+      .then(function(res) {
+        expect(res).to.have.status(201);
+        expect(res).to.be.json;
+        expect(res.body).to.be.a('object');
+        expect(res.body).to.include.keys('id', 'title', 'content', 'author', 'publishDate');
+        expect(res.body.id).to.not.equal(null);
+      });
+  });
+})
+
+describe('PUT endpoint', function(){
+  it('should update items on PUT', function() {
+    const updateData = {
+      title: 'foo',
+      content: 'bar',
+      author: 'Foo McBar'
+    };
+
+    return chai.request(app)
+
+      .get('/blog-posts')
+      .then(function(res) {
+        updateData.id = res.body[0].id;
+
+        return chai.request(app)
+          .put(`/blog-posts/${updateData.id}`)
+          .send(updateData);
+      })
+
+      .then(function(res) {
+        expect(res).to.have.status(204);
+      });
+  });
+})
+
+describe('DELETE endpoint', function(){
+  it('should delete items on DELETE', function() {
+  return chai.request(app)
+    .get('/blog-posts')
+    .then(function(res) {
+  return chai.request(app)
+    .delete(`/blog-posts/${res.body[0].id}`);
+    })
+    .then(function(res) {
+    expect(res).to.have.status(204);
+      });
+  });
+})
+
